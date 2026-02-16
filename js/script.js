@@ -1,3 +1,27 @@
+// Scoreboard variables
+let correctCount = 0;
+let wrongCount = 0;
+const correctCountSpan = document.getElementById('correct-count');
+const wrongCountSpan = document.getElementById('wrong-count');
+const correctPercentSpan = document.getElementById('correct-percent');
+const wrongPercentSpan = document.getElementById('wrong-percent');
+const resetScoreBtn = document.getElementById('reset-score');
+
+function updateScoreboard() {
+    const total = correctCount + wrongCount;
+    const correctPercent = total ? Math.round((correctCount / total) * 100) : 0;
+    const wrongPercent = total ? Math.round((wrongCount / total) * 100) : 0;
+    correctCountSpan.textContent = correctCount;
+    wrongCountSpan.textContent = wrongCount;
+    correctPercentSpan.textContent = correctPercent;
+    wrongPercentSpan.textContent = wrongPercent;
+}
+
+resetScoreBtn.addEventListener('click', () => {
+    correctCount = 0;
+    wrongCount = 0;
+    updateScoreboard();
+});
 // script.js
 const questionDiv = document.getElementById('question');
 const answerInput = document.getElementById('answer');
@@ -73,6 +97,8 @@ submitBtn.addEventListener('click', () => {
     if (userAnswer === currentQuestion.answer) {
         feedbackDiv.textContent = '✅ Correct!';
         feedbackDiv.style.color = 'green';
+        correctCount++;
+        updateScoreboard();
         if (typeof correct_answer === 'function') {
             correct_answer();
             if (currentQuestion.a === 6 && currentQuestion.b === 7) {
@@ -97,6 +123,8 @@ submitBtn.addEventListener('click', () => {
         }
         feedbackDiv.innerHTML = feedback;
         feedbackDiv.style.color = 'red';
+        wrongCount++;
+        updateScoreboard();
         if (typeof playErrorSound === 'function') {
             playErrorSound();
         }
@@ -106,6 +134,7 @@ submitBtn.addEventListener('click', () => {
             const slot = getRandomInt(1, 10);
             questionsUntilNextMissed.push(slot);
         }
+        updateScoreboard();
     }
     answerInput.disabled = true;
     submitBtn.disabled = true;

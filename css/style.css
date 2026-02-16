@@ -1,3 +1,29 @@
+#correct-section {
+    color: #07be07;
+    font-weight: bold;
+    margin-bottom: 4px;
+}
+
+#wrong-section {
+    color: #e73131;
+    font-weight: bold;
+    margin-bottom: 4px;
+}
+#timer {
+    font-size: 1.2em;
+    margin-bottom: 10px;
+}
+#scoreboard {
+    margin-top: 20px;
+    padding: 10px;
+    border-radius: 8px;
+    background: #f9f9f9;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.08);
+}
+
+#reset-score {
+    margin-top: 8px;
+}
 body {
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     background: url('https://egamersworld.com/cdn-cgi/image/width=1600,quality=75,format=webp/uploads/blog/r/ra/rawgogxr40_1759066672029.webp') no-repeat center center fixed;
@@ -15,7 +41,8 @@ body {
 h1 {
     text-align: center;
     margin-top: 30px;
-    color: #000000;
+    color: #132b5f;
+    font-family: 'Comic Sans MS', cursive, sans-serif;
 }
 
 #quiz-container {
@@ -79,7 +106,8 @@ body::before {
     border-radius: 5px;
 }
 
-#submit, #next {
+
+#submit, #next, #reset-score {
     font-size: 1em;
     padding: 8px 18px;
     margin: 10px 5px 0 5px;
@@ -91,7 +119,7 @@ body::before {
     transition: background 0.2s;
 }
 
-#submit:hover, #next:hover {
+#submit:hover, #next:hover, #reset-score:hover {
     background: #388e3c;
 }
 
