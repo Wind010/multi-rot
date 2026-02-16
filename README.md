@@ -1,2 +1,3 @@
 # multi-rot
-Multiplication table with brainrot theme
+Vibe coded multiplication table with brainrot theme
+

@@ -1,0 +1,102 @@
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: url('https://egamersworld.com/cdn-cgi/image/width=1600,quality=75,format=webp/uploads/blog/r/ra/rawgogxr40_1759066672029.webp') no-repeat center center fixed;
+    background-size: cover;
+    margin: 0;
+    padding: 0;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+}
+
+h1 {
+    text-align: center;
+    margin-top: 30px;
+    color: #000000;
+}
+
+#quiz-container {
+    background: #fff;
+    /* background intentionally left unset to allow group color classes to show */
+    width: 60%;
+    max-width: 900px;
+    min-width: 320px;
+    margin: 60px auto;
+    padding: 2.5vw 3vw 3vw 3vw;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    text-align: center;
+    transition: background 0.3s;
+    font-size: 1.2em;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+#quiz-container img {
+    opacity: 1;
+}
+
+body::before {
+    content: "";
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    /* Removed overlay to prevent faded/transparency effect */
+    background: none;
+    pointer-events: none;
+    z-index: 0;
+}
+/* Color classes for each number group (1-12) */
+#quiz-container.group-1 { background: #ffe0e6 !important; }    /* light pink */
+#quiz-container.group-2 { background: #e0f7fa !important; }    /* light cyan */
+#quiz-container.group-3 { background: #fff9c4 !important; }    /* light yellow */
+#quiz-container.group-4 { background: #e1bee7 !important; }    /* light purple */
+#quiz-container.group-5 { background: #ffd1dc !important; }    /* pink */
+#quiz-container.group-6 { background: #c8e6c9 !important; }    /* light green */
+#quiz-container.group-7 { background: #ffe082 !important; }    /* light orange */
+#quiz-container.group-8 { background: #b3e5fc !important; }    /* light blue */
+#quiz-container.group-9 { background: #f8bbd0 !important; }    /* light rose */
+#quiz-container.group-10 { background: #d7ccc8 !important; }   /* light brown */
+#quiz-container.group-11 { background: #f0f4c3 !important; }   /* light lime */
+#quiz-container.group-12 { background: #f5e1da !important; }   /* light peach */
+
+#question {
+    font-size: 1.5em;
+    margin-bottom: 20px;
+    color: #020101;
+}
+
+#answer {
+    font-size: 1.0em;
+    padding: 8px;
+    width: 125px;
+    margin-bottom: 15px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+}
+
+#submit, #next {
+    font-size: 1em;
+    padding: 8px 18px;
+    margin: 10px 5px 0 5px;
+    border: none;
+    border-radius: 5px;
+    background: #4caf50;
+    color: #fff;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+#submit:hover, #next:hover {
+    background: #388e3c;
+}
+
+#feedback {
+    margin-top: 15px;
+    font-size: 1.1em;
+    min-height: 24px;
+}
