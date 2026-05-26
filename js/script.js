@@ -35,11 +35,140 @@ let timerStart = null;
 
 
 let currentQuestion = {};
-let missedQuestionsQueue = [];
-let questionsUntilNextMissed = [];
+const MISSED_REPEAT_MIN = 1;
+const MISSED_REPEAT_MAX = 10;
+const MASTERY_STREAK_TO_CLEAR = 2;
+const missedQuestionSchedule = new Map();
+
+function logRepetition(message, data) {
+    if (data !== undefined) {
+        console.log(`[repetition] ${message}`, data);
+        return;
+    }
+    console.log(`[repetition] ${message}`);
+}
 
 function getRandomInt(min, max) {
     return Math.floor(Math.random() * (max - min + 1)) + min;
+}
+
+function getQuestionKey(question) {
+    return `${question.a}x${question.b}`;
+}
+
+function getAdaptiveRepeatMax(missCount) {
+    // More misses make the retry interval shorter.
+    return Math.max(3, MISSED_REPEAT_MAX - missCount * 2);
+}
+
+function getAdaptiveDueIn(missCount) {
+    return getRandomInt(MISSED_REPEAT_MIN, getAdaptiveRepeatMax(missCount));
+}
+
+function decrementMissedSchedule() {
+    if (missedQuestionSchedule.size > 0) {
+        logRepetition('Tick: decrementing due counters', { scheduledItems: missedQuestionSchedule.size });
+    }
+    missedQuestionSchedule.forEach((entry, key) => {
+        missedQuestionSchedule.set(key, {
+            question: entry.question,
+            dueIn: entry.dueIn - 1,
+            missCount: entry.missCount,
+            masteryStreak: entry.masteryStreak
+        });
+    });
+}
+
+function getNextDueMissedQuestion() {
+    for (const [key, entry] of missedQuestionSchedule) {
+        if (entry.dueIn <= 0) {
+            logRepetition('Serving due missed question', {
+                key,
+                question: entry.question,
+                missCount: entry.missCount,
+                masteryStreak: entry.masteryStreak
+            });
+            return { ...entry.question };
+        }
+    }
+    return null;
+}
+
+function scheduleMissedQuestion(question) {
+    const key = getQuestionKey(question);
+    const existing = missedQuestionSchedule.get(key);
+
+    if (existing) {
+        const missCount = existing.missCount + 1;
+        const adaptiveDueIn = getAdaptiveDueIn(missCount);
+        const dueIn = Math.min(existing.dueIn, adaptiveDueIn);
+        missedQuestionSchedule.set(key, {
+            question: { ...question },
+            dueIn,
+            missCount,
+            masteryStreak: 0
+        });
+        logRepetition('Rescheduled repeated miss', {
+            key,
+            question,
+            missCount,
+            dueIn,
+            previousDueIn: existing.dueIn
+        });
+        return;
+    }
+
+    const dueIn = getAdaptiveDueIn(1);
+    missedQuestionSchedule.set(key, {
+        question: { ...question },
+        dueIn,
+        missCount: 1,
+        masteryStreak: 0
+    });
+    logRepetition('Scheduled new missed question', {
+        key,
+        question,
+        dueIn,
+        missCount: 1
+    });
+}
+
+function handleCorrectAnswer(question) {
+    const key = getQuestionKey(question);
+    const existing = missedQuestionSchedule.get(key);
+
+    if (!existing) {
+        logRepetition('Correct answer on unscheduled question', { key, question });
+        return;
+    }
+
+    const masteryStreak = existing.masteryStreak + 1;
+
+    if (masteryStreak >= MASTERY_STREAK_TO_CLEAR) {
+        missedQuestionSchedule.delete(key);
+        logRepetition('Mastered and removed from schedule', {
+            key,
+            question,
+            masteryStreak,
+            missCount: existing.missCount
+        });
+        return;
+    }
+
+    const dueIn = getRandomInt(2, 4);
+    missedQuestionSchedule.set(key, {
+        question: { ...question },
+        dueIn,
+        missCount: Math.max(1, existing.missCount - 1),
+        masteryStreak
+    });
+    logRepetition('Correct but still in learning schedule', {
+        key,
+        question,
+        dueIn,
+        missCount: Math.max(1, existing.missCount - 1),
+        masteryStreak
+    });
 }
 
 
@@ -56,19 +185,27 @@ function generateQuestion() {
     if (isFirstQuestion) {
         currentQuestion = { a: 6, b: 7, answer: 42 };
         isFirstQuestion = false;
-    } else if (questionsUntilNextMissed.length > 0 && questionsUntilNextMissed[0] === 0 && missedQuestionsQueue.length > 0) {
-        const missed = missedQuestionsQueue.shift();
-        currentQuestion = { ...missed };
-        questionsUntilNextMissed.shift();
     } else {
-        // Decrement all counters
-        questionsUntilNextMissed = questionsUntilNextMissed.map(x => x - 1);
-        // Remove any that are now negative
-        questionsUntilNextMissed = questionsUntilNextMissed.filter(x => x >= 0);
-        // Generate a new random question
-        const a = getRandomInt(1, 12);
-        const b = getRandomInt(1, 12);
-        currentQuestion = { a, b, answer: a * b };
+        decrementMissedSchedule();
+        const nextMissed = getNextDueMissedQuestion();
+
+        if (nextMissed) {
+            currentQuestion = nextMissed;
+            logRepetition('Question source: scheduled repeat', {
+                question: currentQuestion,
+                queueSize: missedQuestionSchedule.size
+            });
+        } else {
+            const a = getRandomInt(1, 12);
+            const b = getRandomInt(1, 12);
+            currentQuestion = { a, b, answer: a * b };
+            if (missedQuestionSchedule.size > 0) {
+                logRepetition('Question source: random (no due repeats yet)', {
+                    question: currentQuestion,
+                    queueSize: missedQuestionSchedule.size
+                });
+            }
+        }
     }
     questionDiv.textContent = `What is ${currentQuestion.a} × ${currentQuestion.b}?`;
     answerInput.value = '';
@@ -98,6 +235,7 @@ submitBtn.addEventListener('click', () => {
         feedbackDiv.textContent = '✅ Correct!';
         feedbackDiv.style.color = 'green';
         correctCount++;
+        handleCorrectAnswer(currentQuestion);
         updateScoreboard();
         if (typeof correct_answer === 'function') {
             correct_answer();
@@ -129,11 +267,7 @@ submitBtn.addEventListener('click', () => {
             playErrorSound();
         }
         // Schedule this question to reappear within the next 10 questions
-        if (!missedQuestionsQueue.some(q => q.a === currentQuestion.a && q.b === currentQuestion.b)) {
-            missedQuestionsQueue.push({ ...currentQuestion });
-            const slot = getRandomInt(1, 10);
-            questionsUntilNextMissed.push(slot);
-        }
+        scheduleMissedQuestion(currentQuestion);
         updateScoreboard();
     }
     answerInput.disabled = true;
