@@ -17,17 +17,33 @@ function correct_answer() {
         startVelocity: 30,
     };
 
+    const corners = [
+        { origin: { x: 0, y: 0 }, angle: 45 },
+        { origin: { x: 1, y: 0 }, angle: 135 },
+        { origin: { x: 0, y: 1 }, angle: 315 },
+        { origin: { x: 1, y: 1 }, angle: 225 }
+    ];
+
+    function shootFromCorners(config) {
+        corners.forEach((corner) => {
+            confetti({
+                ...defaults,
+                ...config,
+                angle: corner.angle,
+                origin: corner.origin
+            });
+        });
+    }
+
     function shoot() {
-        confetti({
-            ...defaults,
+        shootFromCorners({
             particleCount: 20,
             scalar: 1.2,
             shapes: ["circle", "square"],
             colors: ["#a864fd", "#29cdff", "#78ff44", "#ff718d", "#fdff6a"],
         });
 
-        confetti({
-            ...defaults,
+        shootFromCorners({
             particleCount: 40,
             scalar: 5,
             shapes: ["emoji", "image"],
