@@ -1,9 +1,11 @@
 # multi-rot
 
 ## Overview
+
 This is a vibrant, interactive multiplication table quiz app designed to make learning math more engaging and rewarding for children. The app features a playful theme, confetti effects, and a color-coded quiz container to help reinforce number groupings.  Vibe coded with psychological professional.
 
 ## ADHD-Friendly Features
+
 Children with ADHD often benefit from immediate feedback, visual stimulation, and clear progress tracking. This app provides:
 
 - **Instant Feedback:** Correct and incorrect answers are tracked and displayed, with confetti and sound effects for correct answers, making the experience more rewarding.
@@ -13,17 +15,32 @@ Children with ADHD often benefit from immediate feedback, visual stimulation, an
 - **Grouping by Color:** Each multiplication group (e.g., 6x, 7x, etc.) is associated with a specific color in the quiz container, helping children visually connect similar numbers and build memory associations.
 
 ## How It Works
+
 - The app presents multiplication questions up to 12x12.
 - The first question is always 6x7, with a special sound effect for extra reward.
 - Each question's group (the first number) determines the background color of the quiz container.
-- Correct answers trigger confetti and positive sounds; wrong answers are tracked and can be revisited.
+- Correct answers trigger confetti and positive sounds; wrong answers are tracked and repeated using a spaced-repetition scheduler.
 - The scoreboard updates in real time, and a reset button is available.
 
+## Wrong-Answer Repetition Scheduler
+
+The app includes a session-based repetition engine that helps children practice the facts they miss most.
+
+- **Session only:** Scheduling data is kept in memory for the current browser session (it resets on page refresh).
+- **Adaptive retries:** When a question is answered wrong, it is scheduled to return in a future slot. If the same question is missed again, it is scheduled even sooner.
+- **Deduplicated tracking:** Each multiplication fact (for example, 7x8) is tracked as a single scheduled item, so repeats do not create conflicting duplicates.
+- **Reliable due handling:** Scheduled items count down each new question and are shown when due, without dropping other pending items.
+- **Mastery rule:** A previously missed question must be answered correctly **2 times in a row** before it is removed from the learning schedule.
+- **Retention check:** After the first correct answer on a missed fact, the app schedules it again soon (within a few questions) to confirm retention.
+
 ## Why Color Grouping?
+
 Color grouping helps children, especially those with ADHD, visually organize information and recognize patterns. By associating each number group with a unique color, the app makes it easier to spot similarities, recall facts, and stay engaged.
 
 ## Getting Started
+
 Open `index.html` in your browser. No installation required.
 
 ## Customization
+
 You can easily adjust colors, sounds, and confetti images in the CSS and JS files to suit your child's preferences.
